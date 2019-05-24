@@ -1,0 +1,23 @@
+[Unit]
+Description=Document Number Generator API Server
+ConditionPathExists=/home/appadmin/go/src/github.com/howlun/go-kit-documentnogen
+After=network.target
+ 
+[Service]
+Type=simple
+User=root
+Group=root
+LimitNOFILE=1024
+
+Restart=on-failure
+RestartSec=10
+
+WorkingDirectory=/home/appadmin/go/src/github.com/howlun/go-kit-documentnogen
+ExecStart=/usr/bin/sudo /home/appadmin/go/src/github.com/howlun/go-kit-documentnogen/cmd/server/server --httpaddr 8000
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=docnogen-api
+
+[Install]
+WantedBy=multi-user.target
