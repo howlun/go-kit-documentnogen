@@ -1,0 +1,31 @@
+package {{.File.Package}}svc
+
+{{$file := .File}}
+
+import (
+	"fmt"
+
+	context "golang.org/x/net/context"
+    pb "{{cat .GoPWD "/" .DestinationDir | nospace | clean}}/pb"
+)
+
+type {{.File.Package | title}}Service inteface {
+	{{range .Service.Method}}
+		{{.Name}}(ctx context.Context, in *pb.{{.InputType | splitArray "." | last}}) (out *pb.{{.OutputType | splitArray "." | last}}, err error)
+	{{end}}
+}
+
+type {{.File.Package}}Service struct {}
+
+func New{{.File.Package | title}}Service() (s pb.{{$file.Package | title}}ServiceServer) {
+	// TODO: Implement initialization of service
+	s = &{{.File.Package}}Service{}
+	return s
+}
+
+{{range .Service.Method}}
+	func (s *{{.File.Package}}Service) {{.Name}}(ctx context.Context, in *pb.{{.InputType | splitArray "." | last}}) (out *pb.{{.OutputType | splitArray "." | last}}, err error) {
+		// TODO: Implement method logics here
+		return nil, fmt.Errorf("not implemented")
+	}
+{{end}}

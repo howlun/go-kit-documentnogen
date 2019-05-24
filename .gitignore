@@ -1,0 +1,5 @@
+cmd/server/server.exe
+#vendor/*
+cmd/server/log/*
+#Makefile
+#templates/*

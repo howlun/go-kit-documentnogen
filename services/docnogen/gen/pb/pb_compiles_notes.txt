@@ -1,0 +1,8 @@
+# go to the proto source files
+cd go-kit-documentnogen/services/docnogen
+
+# compile the .proto file example docnogen.proto
+protoc --go_out=plugins=grpc:./gen/pb/ docnogen.proto
+
+# docnogen.pb.proto will be generated in go-kit-documentnogen/services/docnogen/gen/pb directory
+# remove any old pb.go file and rename the docnogen.pb.go file to pb.go (manually or by command)

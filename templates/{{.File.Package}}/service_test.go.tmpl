@@ -1,0 +1,18 @@
+package {{.File.Package}}svc
+
+{{$file := .File}}
+
+import (
+	"testing"
+	. "github.com/smartystreets/goconvey/convey"
+
+    pb "{{cat .GoPWD "/" .DestinationDir | nospace | clean}}/pb"
+)
+
+{{range .Service.Method}}
+	func Test_{{.Name}}(t *testing.T) {
+		// TODO: Implement testin for method logics here
+		
+		Convey("This isn't yet implemented", nil)
+	}
+{{end}}

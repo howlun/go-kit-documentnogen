@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package docnogen;
+
+service DocNoGenService {
+    rpc GetNextDocNo(GetNextDocNoRequest) returns (GetNextDocNoResponse) {}
+    rpc ConsumeDocNo(ConsumeDocNoRequest) returns (ConsumeDocNoResponse) {}
+}
+
+message GetNextDocNoRequest {
+    string docCode = 1;
+    string orgCode = 2;
+    string path = 3;
+}
+
+message GetNextDocNoResponse {
+    bool ok = 1;
+    int32 errorCode = 2;
+    string errorMessage = 3;
+
+    message Result {
+        uint32 nextSeqNo = 1;
+        int64 recordTimestamp = 2;
+    }
+    Result result = 4;
+}
+
+message ConsumeDocNoRequest {
+    string docCode = 1;
+    string orgCode = 2;
+    string path = 3;
+    uint32 curSeqNo = 4;
+    int64 recordTimestamp = 5;
+}
+
+message ConsumeDocNoResponse {
+    bool ok = 1;
+    int32 errorCode = 2;
+    string errorMessage = 3;
+
+    message Result {
+        uint32 nextSeqNo = 1;
+        int64 recordTimestamp = 2;
+    }
+    Result result = 4;
+}

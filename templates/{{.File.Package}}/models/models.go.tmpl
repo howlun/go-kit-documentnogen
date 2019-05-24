@@ -1,0 +1,9 @@
+package models
+
+{{$file := .File}}
+
+import (
+    pb "{{cat .GoPWD "/" .DestinationDir | nospace | clean}}/pb"
+)
+
+type Repository interface {}
