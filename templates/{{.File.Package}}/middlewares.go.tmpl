@@ -1,0 +1,68 @@
+package {{.File.Package}}svc
+
+{{$file := .File}}
+
+import (
+	"time"
+
+	context "golang.org/x/net/context"
+	pb "{{cat .GoPWD "/" .DestinationDir | nospace | clean}}/pb"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/metrics"
+)
+
+// Middleware describes a service (as opposed to endpoint) middleware.
+type Middleware func({{.File.Package | title}}Service) {{.File.Package | title}}Service
+
+// LoggingMiddleware takes a logger as a dependency
+// and returns a service middleware.
+type loggingMiddleware struct {
+	next   {{.File.Package | title}}Service
+	logger log.Logger
+}
+
+func LoggingMiddleware(logger log.Logger) Middleware {
+	return func(next {{.File.Package | title}}Service) {{.File.Package | title}}Service {
+		return &loggingMiddleware{
+			next:   next,
+			logger: logger,
+		}
+	}
+}
+
+{{range .Service.Method}}
+	func (mw loggingMiddleware) {{.Name}}(ctx context.Context, in *pb.{{.InputType | splitArray "." | last}}) (out *pb.{{.OutputType | splitArray "." | last}}, err error) {
+		defer func(begin time.Time) {
+			mw.logger.Log("method", "{{.Name}}", "took", time.Since(begin), "err", err)
+		}(time.Now())
+		return mw.next.{{.Name}}(ctx, in)
+	}
+{{end}}
+
+// InstrumentingMiddleware returns a service middleware that instruments
+// the number of integers summed and characters concatenated over the lifetime of
+// the service.
+type instrumentingMiddleware struct {
+	ints  metrics.Counter
+	chars metrics.Counter
+	next   {{.File.Package | title}}Service
+}
+
+func InstrumentingMiddleware(ints, chars metrics.Counter) Middleware {
+	return func(next {{.File.Package | title}}Service) {{.File.Package | title}}Service {
+		return instrumentingMiddleware{
+			//ints:  ints,
+			//chars: chars,
+			next:  next,
+		}
+	}
+}
+
+{{range .Service.Method}}
+	func (mw instrumentingMiddleware) {{.Name}}(ctx context.Context, in *pb.{{.InputType | splitArray "." | last}}) (out *pb.{{.OutputType | splitArray "." | last}}, err error) {
+		v, err := mw.next.{{.Name}}(ctx, in)
+		// TODO: implement instrumenting logic here
+
+		return v, err
+	}
+{{end}}

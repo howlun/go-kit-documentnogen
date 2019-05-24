@@ -1,0 +1,95 @@
+package {{.File.Package}}_httptransport
+
+{{$file := .File}}
+
+import (
+	"errors"
+    stdLog "log"
+	"net/http"
+	"encoding/json"
+	context "golang.org/x/net/context"
+
+	pb "{{cat .GoPWD "/" .DestinationDir | nospace | clean}}/pb"
+	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/log"
+	httptransport "github.com/go-kit/kit/transport/http"
+	endpoints "{{cat .GoPWD "/" .DestinationDir | nospace | clean}}/endpoints"
+)
+
+//var _ = log.Printf
+//var _ = gokit_endpoint.Chain
+//var _ = httptransport.NewClient
+
+
+{{range .Service.Method}}
+	{{if and (not .ServerStreaming) (not .ClientStreaming)}}
+		func Make{{.Name}}Handler(_ context.Context, svc pb.{{$file.Package | title}}ServiceServer, endpoint endpoint.Endpoint, logger log.Logger) *httptransport.Server {
+			options := []httptransport.ServerOption{
+				httptransport.ServerErrorEncoder(errorEncoder),
+				httptransport.ServerErrorLogger(logger),
+			}
+			
+			return httptransport.NewServer(
+				endpoint,
+				decode{{.Name}}Request,
+				encode{{.Name}}Response,
+				options...,
+			)
+		}
+
+		func decode{{.Name}}Request(_ context.Context, r *http.Request) (interface{}, error) {
+			var req pb.{{.InputType | splitArray "." | last}}
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				return nil, err
+			}
+			return &req, nil
+		}
+
+		func encode{{.Name}}Response(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+			if f, ok := response.(endpoint.Failer); ok && f.Failed() != nil {
+				errorEncoder(ctx, f.Failed(), w)
+				return nil
+			}
+			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+			return json.NewEncoder(w).Encode(response)
+		}
+	{{end}}
+{{end}}
+
+func RegisterHandlers(ctx context.Context, svc pb.{{$file.Package | title}}ServiceServer, mux *http.ServeMux, endpoints endpoints.Endpoints, logger log.Logger) error {
+	{{range .Service.Method}}
+		{{if and (not .ServerStreaming) (not .ClientStreaming)}}
+			stdLog.Println("new HTTP endpoint: \"/{{.Name}}\" (service={{$file.Package | title}})")
+			mux.Handle("/{{.Name}}", Make{{.Name}}Handler(ctx, svc, endpoints.{{.Name}}Endpoint, logger))
+		{{end}}
+	{{end}}
+
+	return nil
+}
+
+func errorEncoder(_ context.Context, err error, w http.ResponseWriter) {
+	w.WriteHeader(err2code(err))
+	json.NewEncoder(w).Encode(errorWrapper{Error: err.Error()})
+}
+
+func err2code(err error) int {
+	/*
+	switch err {
+	case addservice.ErrTwoZeroes, addservice.ErrMaxSizeExceeded, addservice.ErrIntOverflow:
+		return http.StatusBadRequest
+	}
+	*/
+	return http.StatusInternalServerError
+}
+
+func errorDecoder(r *http.Response) error {
+	var w errorWrapper
+	if err := json.NewDecoder(r.Body).Decode(&w); err != nil {
+		return err
+	}
+	return errors.New(w.Error)
+}
+
+type errorWrapper struct {
+	Error string `json:"error"`
+}
