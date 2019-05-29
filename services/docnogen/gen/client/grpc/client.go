@@ -13,7 +13,20 @@ import (
 	pb "github.com/howlun/go-kit-documentnogen/services/docnogen/gen/pb"
 )
 
-func New(conn *grpc.ClientConn, logger log.Logger) pb.DocnogenServiceServer {
+func New(conn *grpc.ClientConn, logger log.Logger) pb.DocNoGenServiceServer {
+
+	var generatedocnoformatEndpoint endpoint.Endpoint
+	{
+		generatedocnoformatEndpoint = grpctransport.NewClient(
+			conn,
+			"docnogen.DocnogenService",
+			"GenerateDocNoFormat",
+			EncodeGenerateDocNoFormatRequest,
+			DecodeGenerateDocNoFormatResponse,
+			pb.GenerateDocNoFormatResponse{},
+			append([]grpctransport.ClientOption{}, grpctransport.ClientBefore(jwt.FromGRPCContext()))...,
+		).Endpoint()
+	}
 
 	var getnextdocnoEndpoint endpoint.Endpoint
 	{
@@ -43,10 +56,22 @@ func New(conn *grpc.ClientConn, logger log.Logger) pb.DocnogenServiceServer {
 
 	return &endpoints.Endpoints{
 
+		GenerateDocNoFormatEndpoint: generatedocnoformatEndpoint,
+
 		GetNextDocNoEndpoint: getnextdocnoEndpoint,
 
 		ConsumeDocNoEndpoint: consumedocnoEndpoint,
 	}
+}
+
+func EncodeGenerateDocNoFormatRequest(_ context.Context, request interface{}) (interface{}, error) {
+	req := request.(*pb.GenerateDocNoFormatRequest)
+	return req, nil
+}
+
+func DecodeGenerateDocNoFormatResponse(_ context.Context, grpcResponse interface{}) (interface{}, error) {
+	response := grpcResponse.(*pb.GenerateDocNoFormatResponse)
+	return response, nil
 }
 
 func EncodeGetNextDocNoRequest(_ context.Context, request interface{}) (interface{}, error) {

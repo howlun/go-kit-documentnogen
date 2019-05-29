@@ -19,6 +19,37 @@ import (
 //var _ = gokit_endpoint.Chain
 //var _ = httptransport.NewClient
 
+func MakeGenerateDocNoFormatHandler(_ context.Context, svc pb.DocNoGenServiceServer, endpoint endpoint.Endpoint, logger log.Logger) *httptransport.Server {
+	options := []httptransport.ServerOption{
+		httptransport.ServerErrorEncoder(errorEncoder),
+		httptransport.ServerErrorLogger(logger),
+	}
+
+	return httptransport.NewServer(
+		endpoint,
+		decodeGenerateDocNoFormatRequest,
+		encodeGenerateDocNoFormatResponse,
+		options...,
+	)
+}
+
+func decodeGenerateDocNoFormatRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var req pb.GenerateDocNoFormatRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return &req, nil
+}
+
+func encodeGenerateDocNoFormatResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	if f, ok := response.(endpoint.Failer); ok && f.Failed() != nil {
+		errorEncoder(ctx, f.Failed(), w)
+		return nil
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	return json.NewEncoder(w).Encode(response)
+}
+
 func MakeGetNextDocNoHandler(_ context.Context, svc pb.DocNoGenServiceServer, endpoint endpoint.Endpoint, logger log.Logger) *httptransport.Server {
 	options := []httptransport.ServerOption{
 		httptransport.ServerErrorEncoder(errorEncoder),
@@ -82,6 +113,9 @@ func encodeConsumeDocNoResponse(ctx context.Context, w http.ResponseWriter, resp
 }
 
 func RegisterHandlers(ctx context.Context, svc pb.DocNoGenServiceServer, mux *http.ServeMux, endpoints endpoints.Endpoints, logger log.Logger) error {
+
+	stdLog.Println("new HTTP endpoint: \"/GenerateDocNoFormat\" (service=Docnogen)")
+	mux.Handle("/GenerateDocNoFormat", MakeGenerateDocNoFormatHandler(ctx, svc, endpoints.GenerateDocNoFormatEndpoint, logger))
 
 	stdLog.Println("new HTTP endpoint: \"/GetNextDocNo\" (service=Docnogen)")
 	mux.Handle("/GetNextDocNo", MakeGetNextDocNoHandler(ctx, svc, endpoints.GetNextDocNoEndpoint, logger))

@@ -3,8 +3,29 @@ syntax = "proto3";
 package docnogen;
 
 service DocNoGenService {
+    rpc GenerateDocNoFormat(GenerateDocNoFormatRequest) returns (GenerateDocNoFormatResponse) {}
     rpc GetNextDocNo(GetNextDocNoRequest) returns (GetNextDocNoResponse) {}
     rpc ConsumeDocNo(ConsumeDocNoRequest) returns (ConsumeDocNoResponse) {}
+}
+
+message GenerateDocNoFormatRequest {
+    string docCode = 1;
+    string orgCode = 2;
+    string path = 3;
+    map<string, string> variableMap = 4;
+}
+
+message GenerateDocNoFormatResponse {
+    bool ok = 1;
+    int32 errorCode = 2;
+    string errorMessage = 3;
+
+    message Result {
+        string docNoString = 1;
+        uint32 nextSeqNo = 2;
+        int64 recordTimestamp = 3;
+    }
+    Result result = 4;
 }
 
 message GetNextDocNoRequest {
