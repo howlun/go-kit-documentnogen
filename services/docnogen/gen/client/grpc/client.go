@@ -15,6 +15,19 @@ import (
 
 func New(conn *grpc.ClientConn, logger log.Logger) pb.DocNoGenServiceServer {
 
+	var generateBulkDocNoFormatEndpoint endpoint.Endpoint
+	{
+		generateBulkDocNoFormatEndpoint = grpctransport.NewClient(
+			conn,
+			"docnogen.DocnogenService",
+			"GenerateBulkDocNoFormat",
+			EncodeGenerateBulkDocNoFormatRequest,
+			DecodeGenerateBulkDocNoFormatResponse,
+			pb.GenerateBulkDocNoFormatResponse{},
+			append([]grpctransport.ClientOption{}, grpctransport.ClientBefore(jwt.FromGRPCContext()))...,
+		).Endpoint()
+	}
+
 	var generatedocnoformatEndpoint endpoint.Endpoint
 	{
 		generatedocnoformatEndpoint = grpctransport.NewClient(
@@ -56,12 +69,24 @@ func New(conn *grpc.ClientConn, logger log.Logger) pb.DocNoGenServiceServer {
 
 	return &endpoints.Endpoints{
 
+		GenerateBulkDocNoFormatEndpoint: generateBulkDocNoFormatEndpoint,
+
 		GenerateDocNoFormatEndpoint: generatedocnoformatEndpoint,
 
 		GetNextDocNoEndpoint: getnextdocnoEndpoint,
 
 		ConsumeDocNoEndpoint: consumedocnoEndpoint,
 	}
+}
+
+func EncodeGenerateBulkDocNoFormatRequest(_ context.Context, request interface{}) (interface{}, error) {
+	req := request.(*pb.GenerateBulkDocNoFormatRequest)
+	return req, nil
+}
+
+func DecodeGenerateBulkDocNoFormatResponse(_ context.Context, grpcResponse interface{}) (interface{}, error) {
+	response := grpcResponse.(*pb.GenerateBulkDocNoFormatResponse)
+	return response, nil
 }
 
 func EncodeGenerateDocNoFormatRequest(_ context.Context, request interface{}) (interface{}, error) {
