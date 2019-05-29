@@ -140,7 +140,8 @@ func runMain(c *cli.Context) error {
 		dbclient := docnogenmodel.NewDBClient(c.String("mongoaddr"), c.String("mongodbname"), c.String("mongoauthusername"), c.String("mongoauthpassword"))
 		docNoRepo := docnogenmodel.NewDocNoRepository(dbclient)
 
-		svc := docnogensvc.NewDocnogenService(docNoRepo)
+		docNoFormatterSvc := docnogensvc.NewDocnoformatterService()
+		svc := docnogensvc.NewDocnogenService(docNoRepo, docNoFormatterSvc)
 		endpoints := docnogenendpoints.MakeEndpoints(svc, logger, duration)
 		srv := docnogengrpctransport.MakeGRPCServer(ctx, endpoints, logger)
 		docnogenpb.RegisterDocNoGenServiceServer(s, srv)

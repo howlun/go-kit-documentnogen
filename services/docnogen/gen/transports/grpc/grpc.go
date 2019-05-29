@@ -20,6 +20,13 @@ func MakeGRPCServer(_ context.Context, endpoints endpoints.Endpoints, logger log
 
 	return &grpcServer{
 
+		generatedocnoformat: grpctransport.NewServer(
+			endpoints.GenerateDocNoFormatEndpoint,
+			decodeGenerateDocNoFormatRequest,
+			encodeGenerateDocNoFormatResponse,
+			options...,
+		),
+
 		getnextdocno: grpctransport.NewServer(
 			endpoints.GetNextDocNoEndpoint,
 			decodeGetNextDocNoRequest,
@@ -37,9 +44,28 @@ func MakeGRPCServer(_ context.Context, endpoints endpoints.Endpoints, logger log
 }
 
 type grpcServer struct {
+	generatedocnoformat grpctransport.Handler
+
 	getnextdocno grpctransport.Handler
 
 	consumedocno grpctransport.Handler
+}
+
+func (s *grpcServer) GenerateDocNoFormat(ctx context.Context, req *pb.GenerateDocNoFormatRequest) (*pb.GenerateDocNoFormatResponse, error) {
+	_, rep, err := s.generatedocnoformat.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return rep.(*pb.GenerateDocNoFormatResponse), nil
+}
+
+func decodeGenerateDocNoFormatRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
+	return grpcReq, nil
+}
+
+func encodeGenerateDocNoFormatResponse(_ context.Context, response interface{}) (interface{}, error) {
+	resp := response.(*pb.GenerateDocNoFormatResponse)
+	return resp, nil
 }
 
 func (s *grpcServer) GetNextDocNo(ctx context.Context, req *pb.GetNextDocNoRequest) (*pb.GetNextDocNoResponse, error) {

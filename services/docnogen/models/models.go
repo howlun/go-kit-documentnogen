@@ -7,6 +7,8 @@ import (
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+
+	"github.com/howlun/go-kit-documentnogen/common"
 )
 
 type DBClient interface {
@@ -79,7 +81,7 @@ type DocNo struct {
 
 type DocNoRepository interface {
 	GetByPath(docCode string, orgCode string, path string) (doc *DocNo, err error)
-	UpdateByPath(orgCode string, doc *DocNo) (updated *DocNo, err error)
+	UpdateByPath(orgCode string, doc *DocNo, recordTimestampCheck int64) (updated *DocNo, err error)
 }
 
 type docNoRepository struct {
@@ -150,7 +152,7 @@ func (d *docNoRepository) GetByPath(docCode string, orgCode string, path string)
 	return doc, nil
 }
 
-func (d *docNoRepository) UpdateByPath(orgCode string, doc *DocNo) (updated *DocNo, err error) {
+func (d *docNoRepository) UpdateByPath(orgCode string, doc *DocNo, recordTimestampCheck int64) (updated *DocNo, err error) {
 	if doc == nil {
 		return nil, errors.New("Document to be updated is nil")
 	}
@@ -167,6 +169,10 @@ func (d *docNoRepository) UpdateByPath(orgCode string, doc *DocNo) (updated *Doc
 		return nil, errors.New("Document Next Sequence No is empty")
 	}
 
+	if recordTimestampCheck <= 0 {
+		return nil, errors.New("Record timestamp for concurrency check cannot be zero or less than zero")
+	}
+
 	// Dial to DB with extra info
 	err = d.DB.DialWithInfo()
 	if err != nil {
@@ -181,11 +187,25 @@ func (d *docNoRepository) UpdateByPath(orgCode string, doc *DocNo) (updated *Doc
 		return nil, fmt.Errorf("Collection is nil with Org Code=%s", orgCode)
 	}
 
-	// partial update the document to collection
-	fmt.Println("update the document to collection")
-	err = collection.Update(bson.M{"prefix": doc.Prefix, "path": doc.Path}, bson.M{"$set": bson.M{"nextseqno": doc.NextSeqNo, "recordtimestamp": doc.RecordTimestamp}})
+	// Check if record exists
+	fmt.Println("check if record exist with Prefix and Path")
+	err = collection.Find(bson.M{"prefix": doc.Prefix, "path": doc.Path}).One(&updated)
+	// if has error: either error finding record, or record "not found"
 	if err != nil {
-		return nil, fmt.Errorf("Error updating document with Prefix=%s Path=%s Error=%s", doc.Prefix, doc.Path, err.Error())
+		return nil, fmt.Errorf("Error finding document with Prefix=%s Path=%s Error=%s", doc.Prefix, doc.Path, err.Error())
+	}
+
+	// check if record has been altered before update
+	fmt.Println("check if record has been altered before update")
+	if updated != nil && updated.RecordTimestamp != recordTimestampCheck {
+		return nil, common.ConcurrencyUpdateError
+	}
+
+	// partial update the document to collection if record found
+	fmt.Println("update the document to collection")
+	err = collection.Update(bson.M{"prefix": doc.Prefix, "path": doc.Path, "recordtimestamp": recordTimestampCheck}, bson.M{"$set": bson.M{"nextseqno": doc.NextSeqNo, "recordtimestamp": doc.RecordTimestamp}})
+	if err != nil {
+		return nil, fmt.Errorf("Error updating document with Prefix=%s Path=%s RecordTimestamp=%d  Error=%s", doc.Prefix, doc.Path, recordTimestampCheck, err.Error())
 	}
 	updated = doc
 	fmt.Println(doc)

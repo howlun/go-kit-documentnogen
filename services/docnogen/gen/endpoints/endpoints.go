@@ -23,9 +23,19 @@ var _ = fmt.Errorf
 type StreamEndpoint func(server interface{}, req interface{}) (err error)
 
 type Endpoints struct {
+	GenerateDocNoFormatEndpoint endpoint.Endpoint
+
 	GetNextDocNoEndpoint endpoint.Endpoint
 
 	ConsumeDocNoEndpoint endpoint.Endpoint
+}
+
+func (e *Endpoints) GenerateDocNoFormat(ctx context.Context, in *pb.GenerateDocNoFormatRequest) (*pb.GenerateDocNoFormatResponse, error) {
+	out, err := e.GenerateDocNoFormatEndpoint(ctx, in)
+	if err != nil {
+		return &pb.GenerateDocNoFormatResponse{}, err
+	}
+	return out.(*pb.GenerateDocNoFormatResponse), err
 }
 
 func (e *Endpoints) GetNextDocNo(ctx context.Context, in *pb.GetNextDocNoRequest) (*pb.GetNextDocNoResponse, error) {
@@ -42,6 +52,17 @@ func (e *Endpoints) ConsumeDocNo(ctx context.Context, in *pb.ConsumeDocNoRequest
 		return &pb.ConsumeDocNoResponse{}, err
 	}
 	return out.(*pb.ConsumeDocNoResponse), err
+}
+
+func MakeGenerateDocNoFormatEndpoint(svc pb.DocNoGenServiceServer) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(*pb.GenerateDocNoFormatRequest)
+		rep, err := svc.GenerateDocNoFormat(ctx, req)
+		if err != nil {
+			return &pb.GenerateDocNoFormatResponse{}, err
+		}
+		return rep, nil
+	}
 }
 
 func MakeGetNextDocNoEndpoint(svc pb.DocNoGenServiceServer) endpoint.Endpoint {
@@ -68,6 +89,15 @@ func MakeConsumeDocNoEndpoint(svc pb.DocNoGenServiceServer) endpoint.Endpoint {
 
 func MakeEndpoints(svc pb.DocNoGenServiceServer, logger log.Logger, duration metrics.Histogram) Endpoints {
 
+	var generatedocnoformatEndpoint endpoint.Endpoint
+	{
+		generatedocnoformatEndpoint = MakeGenerateDocNoFormatEndpoint(svc)
+		generatedocnoformatEndpoint = ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 10))(generatedocnoformatEndpoint)
+		generatedocnoformatEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{}))(generatedocnoformatEndpoint)
+		generatedocnoformatEndpoint = LoggingMiddleware(log.With(logger, "method", "GenerateDocNoFormat"))(generatedocnoformatEndpoint)
+		generatedocnoformatEndpoint = InstrumentingMiddleware(duration.With("method", "GenerateDocNoFormat"))(generatedocnoformatEndpoint)
+	}
+
 	var getnextdocnoEndpoint endpoint.Endpoint
 	{
 		getnextdocnoEndpoint = MakeGetNextDocNoEndpoint(svc)
@@ -87,6 +117,8 @@ func MakeEndpoints(svc pb.DocNoGenServiceServer, logger log.Logger, duration met
 	}
 
 	return Endpoints{
+
+		GenerateDocNoFormatEndpoint: generatedocnoformatEndpoint,
 
 		GetNextDocNoEndpoint: getnextdocnoEndpoint,
 
