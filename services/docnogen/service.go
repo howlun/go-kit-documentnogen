@@ -12,6 +12,7 @@ import (
 )
 
 type DocnogenService interface {
+	GenerateBulkDocNoFormat(ctx context.Context, in *pb.GenerateBulkDocNoFormatRequest) (out *pb.GenerateBulkDocNoFormatResponse, err error)
 	GenerateDocNoFormat(ctx context.Context, in *pb.GenerateDocNoFormatRequest) (out *pb.GenerateDocNoFormatResponse, err error)
 	GetNextDocNo(ctx context.Context, in *pb.GetNextDocNoRequest) (out *pb.GetNextDocNoResponse, err error)
 	ConsumeDocNo(ctx context.Context, in *pb.ConsumeDocNoRequest) (out *pb.ConsumeDocNoResponse, err error)
@@ -25,6 +26,161 @@ type docnogenService struct {
 func NewDocnogenService(repo models.DocNoRepository, formatter DocnoformatterService) (s pb.DocNoGenServiceServer) {
 	s = &docnogenService{DocNoRepo: repo, DocNoFormatter: formatter}
 	return s
+}
+
+func (s *docnogenService) GenerateBulkDocNoFormat(ctx context.Context, in *pb.GenerateBulkDocNoFormatRequest) (out *pb.GenerateBulkDocNoFormatResponse, err error) {
+	// check if Repository has been initialized
+
+	if s.DocNoRepo == nil || s.DocNoFormatter == nil {
+		out = &pb.GenerateBulkDocNoFormatResponse{
+			Ok:           false,
+			ErrorCode:    500,
+			ErrorMessage: fmt.Sprint("Document Number Repository or Document Number Formatter is nil"),
+			Results:      []*pb.GenerateBulkDocNoFormatResponse_Result{},
+		}
+	} else {
+		var preCondiErr error
+		// check if DocCode is empty
+		if in.DocCode == "" {
+			preCondiErr = fmt.Errorf("Doc Code is empty")
+		}
+
+		// check if BulkNumber is at least 1 and not more than 99
+		if in.BulkNumber < 1 || in.BulkNumber > 99 {
+			preCondiErr = fmt.Errorf("Bulk Number must be at least 1 and not more than 99")
+		}
+
+		// check if Format string is empty
+		format := s.DocNoFormatter.GetFormatString(in.OrgCode, in.DocCode, in.Path)
+		if format == "" {
+			preCondiErr = fmt.Errorf("Format is empty")
+		}
+
+		// if no error for preconditions
+		if preCondiErr == nil {
+			// start generating document for x number of times (based on BulkNumber)
+			results := []*pb.GenerateBulkDocNoFormatResponse_Result{}
+			for x := 0; x < int(in.BulkNumber); x++ {
+				fmt.Printf("trying to generate doc number for %d/%d...\n", x+1, in.BulkNumber)
+				// try get and consume the sequence number until successful, else if error because concurrency update detechted... keep trying
+				updateSuccess := false
+				for {
+					// this loop will loop infinite until updateSuccess = true
+					docNo, err := s.DocNoRepo.GetByPath(in.DocCode, in.OrgCode, in.Path)
+					if err != nil {
+						out = &pb.GenerateBulkDocNoFormatResponse{
+							Ok:           false,
+							ErrorCode:    500,
+							ErrorMessage: err.Error(),
+							Results:      results,
+						}
+
+						break
+					} else {
+						// if no error, and document not nil, assign result to response
+						if docNo != nil {
+							// generate Sequence Number string
+							seqNoStr := s.DocNoFormatter.GenerateSeqNoStr(in.OrgCode, in.DocCode, in.Path, docNo.NextSeqNo)
+							if seqNoStr == "" {
+								out = &pb.GenerateBulkDocNoFormatResponse{
+									Ok:           false,
+									ErrorCode:    500,
+									ErrorMessage: "Sequence Number String is empty",
+									Results:      results,
+								}
+
+								break
+							}
+
+							// generate Document Number string
+							docNoStr, err := s.DocNoFormatter.GenerateFormatString(format, in.DocCode, seqNoStr, in.VariableMap)
+							if err != nil {
+								out = &pb.GenerateBulkDocNoFormatResponse{
+									Ok:           false,
+									ErrorCode:    500,
+									ErrorMessage: err.Error(),
+									Results:      results,
+								}
+
+								break
+							}
+
+							var r pb.GenerateBulkDocNoFormatResponse_Result
+
+							// consume the sequence number
+							// increase sequence number by 1 and set a new record timestamp to mark record has been altered
+							currSeqNo := docNo.NextSeqNo
+							currRecordTimestamp := docNo.RecordTimestamp
+							docNo.NextSeqNo++
+							docNo.RecordTimestamp = time.Now().Unix()
+							// update the doc to db with concurrency update control
+							updatedDoc, err := s.DocNoRepo.UpdateByPath(in.OrgCode, docNo, currSeqNo, currRecordTimestamp)
+							if err != nil && err != common.ConcurrencyUpdateError {
+								out = &pb.GenerateBulkDocNoFormatResponse{
+									Ok:           false,
+									ErrorCode:    500,
+									ErrorMessage: err.Error(),
+									Results:      results,
+								}
+
+								break
+							} else if err != nil && err == common.ConcurrencyUpdateError {
+								// concurrency update error detected...
+								// loop again
+							} else {
+								// no error, update successful
+								if updatedDoc != nil {
+									r = pb.GenerateBulkDocNoFormatResponse_Result{
+										DocNoString:     docNoStr,
+										NextSeqNo:       uint32(updatedDoc.NextSeqNo),
+										RecordTimestamp: updatedDoc.RecordTimestamp,
+									}
+								}
+								// add r to results
+								results = append(results, &r)
+
+								updateSuccess = true
+							}
+						} else {
+							// else if no document found (which should never hanppen because system will auto generate initial document with sequence number start with 1)
+							out = &pb.GenerateBulkDocNoFormatResponse{
+								Ok:           false,
+								ErrorCode:    500,
+								ErrorMessage: "Something is wrong with the system...",
+								Results:      results,
+							}
+							break
+						}
+					}
+
+					if updateSuccess {
+						// if consume success, break from the loop
+						fmt.Println(results)
+						break
+					}
+				}
+
+			}
+
+			out = &pb.GenerateBulkDocNoFormatResponse{
+				Ok:           true,
+				ErrorCode:    0,
+				ErrorMessage: "",
+				Results:      results,
+			}
+
+		} else {
+			// preconditions have errors
+			out = &pb.GenerateBulkDocNoFormatResponse{
+				Ok:           false,
+				ErrorCode:    500,
+				ErrorMessage: err.Error(),
+				Results:      []*pb.GenerateBulkDocNoFormatResponse_Result{},
+			}
+		}
+	}
+
+	return out, nil
 }
 
 func (s *docnogenService) GenerateDocNoFormat(ctx context.Context, in *pb.GenerateDocNoFormatRequest) (out *pb.GenerateDocNoFormatResponse, err error) {
@@ -98,11 +254,12 @@ func (s *docnogenService) GenerateDocNoFormat(ctx context.Context, in *pb.Genera
 
 						// consume the sequence number
 						// increase sequence number by 1 and set a new record timestamp to mark record has been altered
+						currSeqNo := docNo.NextSeqNo
 						currRecordTimestamp := docNo.RecordTimestamp
 						docNo.NextSeqNo++
 						docNo.RecordTimestamp = time.Now().Unix()
 						// update the doc to db with concurrency update control
-						updatedDoc, err := s.DocNoRepo.UpdateByPath(in.OrgCode, docNo, currRecordTimestamp)
+						updatedDoc, err := s.DocNoRepo.UpdateByPath(in.OrgCode, docNo, currSeqNo, currRecordTimestamp)
 						if err != nil && err != common.ConcurrencyUpdateError {
 							out = &pb.GenerateDocNoFormatResponse{
 								Ok:           false,
@@ -260,7 +417,7 @@ func (s *docnogenService) ConsumeDocNo(ctx context.Context, in *pb.ConsumeDocNoR
 				docNo.NextSeqNo++
 				docNo.RecordTimestamp = time.Now().Unix()
 				// update the doc to db with concurrency update control
-				updatedDoc, err := s.DocNoRepo.UpdateByPath(in.OrgCode, docNo, currRecordTimestamp)
+				updatedDoc, err := s.DocNoRepo.UpdateByPath(in.OrgCode, docNo, int64(in.CurSeqNo), currRecordTimestamp)
 				if err != nil {
 					out = &pb.ConsumeDocNoResponse{
 						Ok:           false,

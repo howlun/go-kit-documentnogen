@@ -23,6 +23,197 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type GenerateBulkDocNoFormatRequest struct {
+	DocCode              string            `protobuf:"bytes,1,opt,name=docCode,proto3" json:"docCode,omitempty"`
+	OrgCode              string            `protobuf:"bytes,2,opt,name=orgCode,proto3" json:"orgCode,omitempty"`
+	Path                 string            `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
+	VariableMap          map[string]string `protobuf:"bytes,4,rep,name=variableMap,proto3" json:"variableMap,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	BulkNumber           uint32            `protobuf:"varint,5,opt,name=bulkNumber,proto3" json:"bulkNumber,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *GenerateBulkDocNoFormatRequest) Reset()         { *m = GenerateBulkDocNoFormatRequest{} }
+func (m *GenerateBulkDocNoFormatRequest) String() string { return proto.CompactTextString(m) }
+func (*GenerateBulkDocNoFormatRequest) ProtoMessage()    {}
+func (*GenerateBulkDocNoFormatRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{0}
+}
+
+func (m *GenerateBulkDocNoFormatRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GenerateBulkDocNoFormatRequest.Unmarshal(m, b)
+}
+func (m *GenerateBulkDocNoFormatRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GenerateBulkDocNoFormatRequest.Marshal(b, m, deterministic)
+}
+func (m *GenerateBulkDocNoFormatRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GenerateBulkDocNoFormatRequest.Merge(m, src)
+}
+func (m *GenerateBulkDocNoFormatRequest) XXX_Size() int {
+	return xxx_messageInfo_GenerateBulkDocNoFormatRequest.Size(m)
+}
+func (m *GenerateBulkDocNoFormatRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GenerateBulkDocNoFormatRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GenerateBulkDocNoFormatRequest proto.InternalMessageInfo
+
+func (m *GenerateBulkDocNoFormatRequest) GetDocCode() string {
+	if m != nil {
+		return m.DocCode
+	}
+	return ""
+}
+
+func (m *GenerateBulkDocNoFormatRequest) GetOrgCode() string {
+	if m != nil {
+		return m.OrgCode
+	}
+	return ""
+}
+
+func (m *GenerateBulkDocNoFormatRequest) GetPath() string {
+	if m != nil {
+		return m.Path
+	}
+	return ""
+}
+
+func (m *GenerateBulkDocNoFormatRequest) GetVariableMap() map[string]string {
+	if m != nil {
+		return m.VariableMap
+	}
+	return nil
+}
+
+func (m *GenerateBulkDocNoFormatRequest) GetBulkNumber() uint32 {
+	if m != nil {
+		return m.BulkNumber
+	}
+	return 0
+}
+
+type GenerateBulkDocNoFormatResponse struct {
+	Ok                   bool                                      `protobuf:"varint,1,opt,name=ok,proto3" json:"ok"`
+	ErrorCode            int32                                     `protobuf:"varint,2,opt,name=errorCode,proto3" json:"errorCode,omitempty"`
+	ErrorMessage         string                                    `protobuf:"bytes,3,opt,name=errorMessage,proto3" json:"errorMessage,omitempty"`
+	Results              []*GenerateBulkDocNoFormatResponse_Result `protobuf:"bytes,4,rep,name=results,proto3" json:"results,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                                  `json:"-"`
+	XXX_unrecognized     []byte                                    `json:"-"`
+	XXX_sizecache        int32                                     `json:"-"`
+}
+
+func (m *GenerateBulkDocNoFormatResponse) Reset()         { *m = GenerateBulkDocNoFormatResponse{} }
+func (m *GenerateBulkDocNoFormatResponse) String() string { return proto.CompactTextString(m) }
+func (*GenerateBulkDocNoFormatResponse) ProtoMessage()    {}
+func (*GenerateBulkDocNoFormatResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{1}
+}
+
+func (m *GenerateBulkDocNoFormatResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GenerateBulkDocNoFormatResponse.Unmarshal(m, b)
+}
+func (m *GenerateBulkDocNoFormatResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GenerateBulkDocNoFormatResponse.Marshal(b, m, deterministic)
+}
+func (m *GenerateBulkDocNoFormatResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GenerateBulkDocNoFormatResponse.Merge(m, src)
+}
+func (m *GenerateBulkDocNoFormatResponse) XXX_Size() int {
+	return xxx_messageInfo_GenerateBulkDocNoFormatResponse.Size(m)
+}
+func (m *GenerateBulkDocNoFormatResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GenerateBulkDocNoFormatResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GenerateBulkDocNoFormatResponse proto.InternalMessageInfo
+
+func (m *GenerateBulkDocNoFormatResponse) GetOk() bool {
+	if m != nil {
+		return m.Ok
+	}
+	return false
+}
+
+func (m *GenerateBulkDocNoFormatResponse) GetErrorCode() int32 {
+	if m != nil {
+		return m.ErrorCode
+	}
+	return 0
+}
+
+func (m *GenerateBulkDocNoFormatResponse) GetErrorMessage() string {
+	if m != nil {
+		return m.ErrorMessage
+	}
+	return ""
+}
+
+func (m *GenerateBulkDocNoFormatResponse) GetResults() []*GenerateBulkDocNoFormatResponse_Result {
+	if m != nil {
+		return m.Results
+	}
+	return nil
+}
+
+type GenerateBulkDocNoFormatResponse_Result struct {
+	DocNoString          string   `protobuf:"bytes,1,opt,name=docNoString,proto3" json:"docNoString,omitempty"`
+	NextSeqNo            uint32   `protobuf:"varint,2,opt,name=nextSeqNo,proto3" json:"nextSeqNo,omitempty"`
+	RecordTimestamp      int64    `protobuf:"varint,3,opt,name=recordTimestamp,proto3" json:"recordTimestamp,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GenerateBulkDocNoFormatResponse_Result) Reset() {
+	*m = GenerateBulkDocNoFormatResponse_Result{}
+}
+func (m *GenerateBulkDocNoFormatResponse_Result) String() string { return proto.CompactTextString(m) }
+func (*GenerateBulkDocNoFormatResponse_Result) ProtoMessage()    {}
+func (*GenerateBulkDocNoFormatResponse_Result) Descriptor() ([]byte, []int) {
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{1, 0}
+}
+
+func (m *GenerateBulkDocNoFormatResponse_Result) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GenerateBulkDocNoFormatResponse_Result.Unmarshal(m, b)
+}
+func (m *GenerateBulkDocNoFormatResponse_Result) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GenerateBulkDocNoFormatResponse_Result.Marshal(b, m, deterministic)
+}
+func (m *GenerateBulkDocNoFormatResponse_Result) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GenerateBulkDocNoFormatResponse_Result.Merge(m, src)
+}
+func (m *GenerateBulkDocNoFormatResponse_Result) XXX_Size() int {
+	return xxx_messageInfo_GenerateBulkDocNoFormatResponse_Result.Size(m)
+}
+func (m *GenerateBulkDocNoFormatResponse_Result) XXX_DiscardUnknown() {
+	xxx_messageInfo_GenerateBulkDocNoFormatResponse_Result.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GenerateBulkDocNoFormatResponse_Result proto.InternalMessageInfo
+
+func (m *GenerateBulkDocNoFormatResponse_Result) GetDocNoString() string {
+	if m != nil {
+		return m.DocNoString
+	}
+	return ""
+}
+
+func (m *GenerateBulkDocNoFormatResponse_Result) GetNextSeqNo() uint32 {
+	if m != nil {
+		return m.NextSeqNo
+	}
+	return 0
+}
+
+func (m *GenerateBulkDocNoFormatResponse_Result) GetRecordTimestamp() int64 {
+	if m != nil {
+		return m.RecordTimestamp
+	}
+	return 0
+}
+
 type GenerateDocNoFormatRequest struct {
 	DocCode              string            `protobuf:"bytes,1,opt,name=docCode,proto3" json:"docCode,omitempty"`
 	OrgCode              string            `protobuf:"bytes,2,opt,name=orgCode,proto3" json:"orgCode,omitempty"`
@@ -37,7 +228,7 @@ func (m *GenerateDocNoFormatRequest) Reset()         { *m = GenerateDocNoFormatR
 func (m *GenerateDocNoFormatRequest) String() string { return proto.CompactTextString(m) }
 func (*GenerateDocNoFormatRequest) ProtoMessage()    {}
 func (*GenerateDocNoFormatRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fb7cc0a8d5129ab9, []int{0}
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{2}
 }
 
 func (m *GenerateDocNoFormatRequest) XXX_Unmarshal(b []byte) error {
@@ -100,7 +291,7 @@ func (m *GenerateDocNoFormatResponse) Reset()         { *m = GenerateDocNoFormat
 func (m *GenerateDocNoFormatResponse) String() string { return proto.CompactTextString(m) }
 func (*GenerateDocNoFormatResponse) ProtoMessage()    {}
 func (*GenerateDocNoFormatResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fb7cc0a8d5129ab9, []int{1}
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{3}
 }
 
 func (m *GenerateDocNoFormatResponse) XXX_Unmarshal(b []byte) error {
@@ -162,7 +353,7 @@ func (m *GenerateDocNoFormatResponse_Result) Reset()         { *m = GenerateDocN
 func (m *GenerateDocNoFormatResponse_Result) String() string { return proto.CompactTextString(m) }
 func (*GenerateDocNoFormatResponse_Result) ProtoMessage()    {}
 func (*GenerateDocNoFormatResponse_Result) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fb7cc0a8d5129ab9, []int{1, 0}
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{3, 0}
 }
 
 func (m *GenerateDocNoFormatResponse_Result) XXX_Unmarshal(b []byte) error {
@@ -217,7 +408,7 @@ func (m *GetNextDocNoRequest) Reset()         { *m = GetNextDocNoRequest{} }
 func (m *GetNextDocNoRequest) String() string { return proto.CompactTextString(m) }
 func (*GetNextDocNoRequest) ProtoMessage()    {}
 func (*GetNextDocNoRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fb7cc0a8d5129ab9, []int{2}
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{4}
 }
 
 func (m *GetNextDocNoRequest) XXX_Unmarshal(b []byte) error {
@@ -273,7 +464,7 @@ func (m *GetNextDocNoResponse) Reset()         { *m = GetNextDocNoResponse{} }
 func (m *GetNextDocNoResponse) String() string { return proto.CompactTextString(m) }
 func (*GetNextDocNoResponse) ProtoMessage()    {}
 func (*GetNextDocNoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fb7cc0a8d5129ab9, []int{3}
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{5}
 }
 
 func (m *GetNextDocNoResponse) XXX_Unmarshal(b []byte) error {
@@ -334,7 +525,7 @@ func (m *GetNextDocNoResponse_Result) Reset()         { *m = GetNextDocNoRespons
 func (m *GetNextDocNoResponse_Result) String() string { return proto.CompactTextString(m) }
 func (*GetNextDocNoResponse_Result) ProtoMessage()    {}
 func (*GetNextDocNoResponse_Result) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fb7cc0a8d5129ab9, []int{3, 0}
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{5, 0}
 }
 
 func (m *GetNextDocNoResponse_Result) XXX_Unmarshal(b []byte) error {
@@ -384,7 +575,7 @@ func (m *ConsumeDocNoRequest) Reset()         { *m = ConsumeDocNoRequest{} }
 func (m *ConsumeDocNoRequest) String() string { return proto.CompactTextString(m) }
 func (*ConsumeDocNoRequest) ProtoMessage()    {}
 func (*ConsumeDocNoRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fb7cc0a8d5129ab9, []int{4}
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{6}
 }
 
 func (m *ConsumeDocNoRequest) XXX_Unmarshal(b []byte) error {
@@ -454,7 +645,7 @@ func (m *ConsumeDocNoResponse) Reset()         { *m = ConsumeDocNoResponse{} }
 func (m *ConsumeDocNoResponse) String() string { return proto.CompactTextString(m) }
 func (*ConsumeDocNoResponse) ProtoMessage()    {}
 func (*ConsumeDocNoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fb7cc0a8d5129ab9, []int{5}
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{7}
 }
 
 func (m *ConsumeDocNoResponse) XXX_Unmarshal(b []byte) error {
@@ -515,7 +706,7 @@ func (m *ConsumeDocNoResponse_Result) Reset()         { *m = ConsumeDocNoRespons
 func (m *ConsumeDocNoResponse_Result) String() string { return proto.CompactTextString(m) }
 func (*ConsumeDocNoResponse_Result) ProtoMessage()    {}
 func (*ConsumeDocNoResponse_Result) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fb7cc0a8d5129ab9, []int{5, 0}
+	return fileDescriptor_fb7cc0a8d5129ab9, []int{7, 0}
 }
 
 func (m *ConsumeDocNoResponse_Result) XXX_Unmarshal(b []byte) error {
@@ -551,6 +742,10 @@ func (m *ConsumeDocNoResponse_Result) GetRecordTimestamp() int64 {
 }
 
 func init() {
+	proto.RegisterType((*GenerateBulkDocNoFormatRequest)(nil), "docnogen.GenerateBulkDocNoFormatRequest")
+	proto.RegisterMapType((map[string]string)(nil), "docnogen.GenerateBulkDocNoFormatRequest.VariableMapEntry")
+	proto.RegisterType((*GenerateBulkDocNoFormatResponse)(nil), "docnogen.GenerateBulkDocNoFormatResponse")
+	proto.RegisterType((*GenerateBulkDocNoFormatResponse_Result)(nil), "docnogen.GenerateBulkDocNoFormatResponse.Result")
 	proto.RegisterType((*GenerateDocNoFormatRequest)(nil), "docnogen.GenerateDocNoFormatRequest")
 	proto.RegisterMapType((map[string]string)(nil), "docnogen.GenerateDocNoFormatRequest.VariableMapEntry")
 	proto.RegisterType((*GenerateDocNoFormatResponse)(nil), "docnogen.GenerateDocNoFormatResponse")
@@ -566,39 +761,44 @@ func init() {
 func init() { proto.RegisterFile("docnogen.proto", fileDescriptor_fb7cc0a8d5129ab9) }
 
 var fileDescriptor_fb7cc0a8d5129ab9 = []byte{
-	// 497 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x95, 0x4d, 0x6f, 0xd3, 0x40,
-	0x10, 0x86, 0x6b, 0xe7, 0x83, 0x74, 0x52, 0xda, 0x6a, 0xda, 0x83, 0x65, 0x3e, 0x14, 0x59, 0x54,
-	0xca, 0x01, 0xe5, 0x10, 0x84, 0x84, 0x90, 0xe0, 0xd2, 0x42, 0x4e, 0x0d, 0xc8, 0x41, 0x70, 0xe2,
-	0xb0, 0xb5, 0x47, 0x21, 0x4a, 0xb2, 0xe3, 0xae, 0xd7, 0x51, 0xfb, 0x53, 0x38, 0x73, 0xe2, 0x27,
-	0x72, 0x40, 0x42, 0x5e, 0x3b, 0x89, 0x93, 0x3a, 0x90, 0x03, 0x51, 0x6f, 0x3b, 0xb3, 0xbb, 0xef,
-	0x3e, 0xfb, 0xce, 0xac, 0x0d, 0x87, 0x21, 0x07, 0x92, 0x87, 0x24, 0x3b, 0x91, 0x62, 0xcd, 0xd8,
-	0x98, 0xc7, 0xde, 0x6f, 0x0b, 0xdc, 0x1e, 0x49, 0x52, 0x42, 0xd3, 0x05, 0x07, 0x7d, 0x7e, 0xcf,
-	0x6a, 0x2a, 0xb4, 0x4f, 0xd7, 0x09, 0xc5, 0x1a, 0x1d, 0x78, 0x10, 0x72, 0x70, 0xce, 0x21, 0x39,
-	0x56, 0xcb, 0x6a, 0xef, 0xfb, 0xf3, 0x30, 0x9d, 0x61, 0x35, 0x34, 0x33, 0x76, 0x36, 0x93, 0x87,
-	0x88, 0x50, 0x8d, 0x84, 0xfe, 0xe6, 0x54, 0x4c, 0xda, 0x8c, 0xf1, 0x0b, 0x34, 0x67, 0x42, 0x8d,
-	0xc4, 0xd5, 0x84, 0x2e, 0x45, 0xe4, 0x54, 0x5b, 0x95, 0x76, 0xb3, 0xfb, 0xb2, 0xb3, 0xc0, 0xda,
-	0x8c, 0xd0, 0xf9, 0xbc, 0xdc, 0xf7, 0x4e, 0x6a, 0x75, 0xeb, 0x17, 0x95, 0xdc, 0xb7, 0x70, 0xbc,
-	0xbe, 0x00, 0x8f, 0xa1, 0x32, 0xa6, 0xdb, 0x1c, 0x38, 0x1d, 0xe2, 0x29, 0xd4, 0x66, 0x62, 0x92,
-	0xcc, 0x51, 0xb3, 0xe0, 0xb5, 0xfd, 0xca, 0xf2, 0x7e, 0xda, 0xf0, 0xa8, 0xf4, 0xf0, 0x38, 0x62,
-	0x19, 0x13, 0x1e, 0x82, 0xcd, 0x63, 0x23, 0xd5, 0xf0, 0x6d, 0x1e, 0xe3, 0x63, 0xd8, 0x27, 0xa5,
-	0x58, 0x2d, 0x2e, 0x5e, 0xf3, 0x97, 0x09, 0xf4, 0xe0, 0xc0, 0x04, 0x97, 0x14, 0xc7, 0x62, 0x48,
-	0xb9, 0x05, 0x2b, 0x39, 0xbc, 0x80, 0xba, 0xa2, 0x38, 0x99, 0x68, 0xa7, 0xda, 0xb2, 0xda, 0xcd,
-	0xee, 0xf3, 0x7f, 0xb8, 0x90, 0x81, 0x74, 0x7c, 0xb3, 0xc7, 0xcf, 0xf7, 0xba, 0x0a, 0xea, 0x59,
-	0x06, 0x5b, 0xd0, 0x0c, 0xd3, 0xf5, 0x03, 0xad, 0x46, 0x72, 0x98, 0xdf, 0xba, 0x98, 0x4a, 0x99,
-	0x25, 0xdd, 0xe8, 0x01, 0x5d, 0xf7, 0xd9, 0x30, 0x3f, 0xf4, 0x97, 0x09, 0x6c, 0xc3, 0x91, 0xa2,
-	0x80, 0x55, 0xf8, 0x69, 0x34, 0xa5, 0x58, 0x8b, 0x69, 0x64, 0xb0, 0x2b, 0xfe, 0x7a, 0xda, 0xfb,
-	0x0a, 0x27, 0x3d, 0xd2, 0x7d, 0xba, 0xd1, 0x06, 0xf0, 0x3f, 0xf7, 0x88, 0xf7, 0xcb, 0x82, 0xd3,
-	0x55, 0xfd, 0x9d, 0xd5, 0xe0, 0xcd, 0x5a, 0x0d, 0xce, 0x8a, 0x35, 0xb8, 0x4b, 0xb0, 0x6e, 0xfe,
-	0xc7, 0x85, 0xf9, 0x2b, 0xd6, 0x5a, 0x5b, 0x58, 0x6b, 0x97, 0x5b, 0xfb, 0xc3, 0x82, 0x93, 0x73,
-	0x96, 0x71, 0x32, 0xa5, 0x5d, 0x78, 0x8b, 0x2e, 0x34, 0x82, 0x44, 0x65, 0x98, 0x55, 0x83, 0xb9,
-	0x88, 0xcb, 0x28, 0x6b, 0xe5, 0x94, 0x69, 0x85, 0x56, 0x29, 0xef, 0xa3, 0x42, 0x65, 0x04, 0x3b,
-	0xaf, 0x50, 0xf7, 0xbb, 0x0d, 0x47, 0xe6, 0xc8, 0x1e, 0xc9, 0x01, 0xa9, 0xd9, 0x28, 0x20, 0x0c,
-	0xd3, 0x07, 0x71, 0xe7, 0xc9, 0xe2, 0xb3, 0x6d, 0xbe, 0x6b, 0xee, 0xd9, 0x56, 0xef, 0xde, 0xdb,
-	0xc3, 0x0f, 0x70, 0x50, 0x6c, 0x4a, 0x7c, 0xb2, 0xa9, 0x59, 0x33, 0xdd, 0xa7, 0x7f, 0xef, 0xe5,
-	0x4c, 0xb0, 0xe8, 0x61, 0x51, 0xb0, 0xa4, 0x07, 0x8b, 0x82, 0x65, 0xd6, 0x7b, 0x7b, 0x57, 0x75,
-	0xf3, 0x57, 0x79, 0xf1, 0x27, 0x00, 0x00, 0xff, 0xff, 0xbf, 0xd7, 0x4a, 0xb5, 0x67, 0x06, 0x00,
-	0x00,
+	// 589 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0x5d, 0x8b, 0xd3, 0x40,
+	0x14, 0x6d, 0xd2, 0x8f, 0xed, 0xde, 0xee, 0x17, 0x77, 0x17, 0x0c, 0x51, 0x6b, 0x09, 0x2e, 0x44,
+	0x90, 0x22, 0x15, 0x41, 0x05, 0x7d, 0x70, 0x57, 0x0b, 0xc2, 0x56, 0x49, 0x45, 0x1f, 0xc4, 0x87,
+	0x34, 0xb9, 0xd4, 0xd2, 0x36, 0x93, 0x9d, 0x4c, 0xca, 0xee, 0x6f, 0xf0, 0x67, 0x88, 0x0f, 0x3e,
+	0xfb, 0xeb, 0x7c, 0x10, 0x24, 0x93, 0xb4, 0x4d, 0xdb, 0x74, 0x8d, 0x68, 0xd9, 0xb7, 0xdc, 0x3b,
+	0xcc, 0xc9, 0x99, 0x73, 0xce, 0xdc, 0x04, 0xf6, 0x5c, 0xe6, 0x78, 0xac, 0x4f, 0x5e, 0xd3, 0xe7,
+	0x4c, 0x30, 0xac, 0x4e, 0x6b, 0xe3, 0x9b, 0x0a, 0xf5, 0x36, 0x79, 0xc4, 0x6d, 0x41, 0x2f, 0xc2,
+	0xd1, 0xf0, 0x94, 0x39, 0x1d, 0xf6, 0x8a, 0xf1, 0xb1, 0x2d, 0x2c, 0x3a, 0x0f, 0x29, 0x10, 0xa8,
+	0xc1, 0x96, 0xcb, 0x9c, 0x13, 0xe6, 0x92, 0xa6, 0x34, 0x14, 0x73, 0xdb, 0x9a, 0x96, 0xd1, 0x0a,
+	0xe3, 0x7d, 0xb9, 0xa2, 0xc6, 0x2b, 0x49, 0x89, 0x08, 0x25, 0xdf, 0x16, 0x9f, 0xb5, 0xa2, 0x6c,
+	0xcb, 0x67, 0xfc, 0x08, 0xb5, 0x89, 0xcd, 0x07, 0x76, 0x6f, 0x44, 0x67, 0xb6, 0xaf, 0x95, 0x1a,
+	0x45, 0xb3, 0xd6, 0x7a, 0xd2, 0x9c, 0x51, 0xbb, 0x9a, 0x46, 0xf3, 0xfd, 0x7c, 0xef, 0x4b, 0x4f,
+	0xf0, 0x4b, 0x2b, 0x8d, 0x86, 0x75, 0x80, 0x5e, 0x38, 0x1a, 0x76, 0xc2, 0x71, 0x8f, 0xb8, 0x56,
+	0x6e, 0x28, 0xe6, 0xae, 0x95, 0xea, 0xe8, 0xcf, 0xe1, 0x60, 0x19, 0x00, 0x0f, 0xa0, 0x38, 0xa4,
+	0xcb, 0xe4, 0x50, 0xd1, 0x23, 0x1e, 0x41, 0x79, 0x62, 0x8f, 0xc2, 0xe9, 0x71, 0xe2, 0xe2, 0xa9,
+	0xfa, 0x58, 0x31, 0x7e, 0xa8, 0x70, 0x67, 0x2d, 0xc1, 0xc0, 0x67, 0x5e, 0x40, 0xb8, 0x07, 0x2a,
+	0x1b, 0x4a, 0xb8, 0xaa, 0xa5, 0xb2, 0x21, 0xde, 0x82, 0x6d, 0xe2, 0x9c, 0xf1, 0x99, 0x40, 0x65,
+	0x6b, 0xde, 0x40, 0x03, 0x76, 0x64, 0x71, 0x46, 0x41, 0x60, 0xf7, 0x29, 0x91, 0x6a, 0xa1, 0x87,
+	0xaf, 0x61, 0x8b, 0x53, 0x10, 0x8e, 0x44, 0x90, 0xc8, 0xf5, 0x20, 0x87, 0x5c, 0x31, 0x9b, 0xa6,
+	0x25, 0x37, 0x5a, 0x53, 0x00, 0x9d, 0x43, 0x25, 0x6e, 0x61, 0x03, 0x6a, 0x6e, 0xb4, 0xa1, 0x2b,
+	0xf8, 0xc0, 0xeb, 0x27, 0xe7, 0x4f, 0xb7, 0x22, 0xe6, 0x1e, 0x5d, 0x88, 0x2e, 0x9d, 0x77, 0x98,
+	0x64, 0xbe, 0x6b, 0xcd, 0x1b, 0x68, 0xc2, 0x3e, 0x27, 0x87, 0x71, 0xf7, 0xdd, 0x60, 0x4c, 0x81,
+	0xb0, 0xc7, 0xbe, 0x24, 0x5f, 0xb4, 0x96, 0xdb, 0xc6, 0x2f, 0x05, 0xf4, 0x29, 0xcf, 0x0d, 0x26,
+	0xeb, 0x43, 0x56, 0xb2, 0x1e, 0xad, 0x4a, 0xf5, 0xb7, 0xa9, 0xfa, 0xe7, 0xd4, 0x7c, 0x57, 0xe1,
+	0x66, 0xe6, 0xcb, 0x37, 0x96, 0x98, 0x53, 0xa8, 0xc4, 0x86, 0x6b, 0xa5, 0x86, 0x62, 0xd6, 0x5a,
+	0xf7, 0xff, 0xa0, 0xc2, 0x62, 0x58, 0x92, 0xbd, 0xd7, 0x92, 0x95, 0x4f, 0x70, 0xd8, 0x26, 0xd1,
+	0xa1, 0x0b, 0x21, 0x09, 0xfe, 0xe7, 0x8c, 0x18, 0x3f, 0x15, 0x38, 0x5a, 0xc4, 0xdf, 0x98, 0x07,
+	0xcf, 0x96, 0x3c, 0x38, 0x4e, 0x7b, 0xb0, 0xca, 0x60, 0x59, 0xfc, 0xb7, 0x33, 0xf1, 0x17, 0xa4,
+	0x55, 0x72, 0x48, 0xab, 0x66, 0x4b, 0xfb, 0x55, 0x81, 0xc3, 0x13, 0xe6, 0x05, 0xe1, 0x98, 0x36,
+	0xa1, 0x2d, 0xea, 0x50, 0x75, 0x42, 0x1e, 0xd3, 0x2c, 0x49, 0x9a, 0xb3, 0x3a, 0x8b, 0x65, 0x39,
+	0x9b, 0x65, 0xe4, 0xd0, 0x22, 0xcb, 0xeb, 0x70, 0x28, 0x8b, 0xc1, 0xc6, 0x1d, 0x6a, 0x7d, 0x29,
+	0xc2, 0xbe, 0x7c, 0x65, 0x9b, 0xbc, 0x2e, 0xf1, 0xc9, 0xc0, 0x21, 0xf4, 0xe1, 0xc6, 0x9a, 0x19,
+	0x8f, 0x66, 0xde, 0xaf, 0xa6, 0x7e, 0x2f, 0xf7, 0x07, 0xc3, 0x28, 0xa0, 0x1b, 0x5d, 0xc1, 0x95,
+	0x21, 0x81, 0x77, 0xf3, 0x4c, 0x52, 0xfd, 0x38, 0xd7, 0xa4, 0x31, 0x0a, 0xf8, 0x06, 0x76, 0xd2,
+	0xd7, 0x00, 0x6f, 0xaf, 0xbb, 0x1e, 0x31, 0x6e, 0xfd, 0xea, 0xdb, 0x13, 0x03, 0xa6, 0x5d, 0x4b,
+	0x03, 0x66, 0xa4, 0x3e, 0x0d, 0x98, 0x65, 0xb6, 0x51, 0xe8, 0x55, 0xe4, 0x5f, 0xd2, 0xc3, 0xdf,
+	0x01, 0x00, 0x00, 0xff, 0xff, 0x1b, 0x0d, 0xdb, 0xe2, 0x37, 0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -613,6 +813,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type DocNoGenServiceClient interface {
+	GenerateBulkDocNoFormat(ctx context.Context, in *GenerateBulkDocNoFormatRequest, opts ...grpc.CallOption) (*GenerateBulkDocNoFormatResponse, error)
 	GenerateDocNoFormat(ctx context.Context, in *GenerateDocNoFormatRequest, opts ...grpc.CallOption) (*GenerateDocNoFormatResponse, error)
 	GetNextDocNo(ctx context.Context, in *GetNextDocNoRequest, opts ...grpc.CallOption) (*GetNextDocNoResponse, error)
 	ConsumeDocNo(ctx context.Context, in *ConsumeDocNoRequest, opts ...grpc.CallOption) (*ConsumeDocNoResponse, error)
@@ -624,6 +825,15 @@ type docNoGenServiceClient struct {
 
 func NewDocNoGenServiceClient(cc *grpc.ClientConn) DocNoGenServiceClient {
 	return &docNoGenServiceClient{cc}
+}
+
+func (c *docNoGenServiceClient) GenerateBulkDocNoFormat(ctx context.Context, in *GenerateBulkDocNoFormatRequest, opts ...grpc.CallOption) (*GenerateBulkDocNoFormatResponse, error) {
+	out := new(GenerateBulkDocNoFormatResponse)
+	err := c.cc.Invoke(ctx, "/docnogen.DocNoGenService/GenerateBulkDocNoFormat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *docNoGenServiceClient) GenerateDocNoFormat(ctx context.Context, in *GenerateDocNoFormatRequest, opts ...grpc.CallOption) (*GenerateDocNoFormatResponse, error) {
@@ -655,6 +865,7 @@ func (c *docNoGenServiceClient) ConsumeDocNo(ctx context.Context, in *ConsumeDoc
 
 // DocNoGenServiceServer is the server API for DocNoGenService service.
 type DocNoGenServiceServer interface {
+	GenerateBulkDocNoFormat(context.Context, *GenerateBulkDocNoFormatRequest) (*GenerateBulkDocNoFormatResponse, error)
 	GenerateDocNoFormat(context.Context, *GenerateDocNoFormatRequest) (*GenerateDocNoFormatResponse, error)
 	GetNextDocNo(context.Context, *GetNextDocNoRequest) (*GetNextDocNoResponse, error)
 	ConsumeDocNo(context.Context, *ConsumeDocNoRequest) (*ConsumeDocNoResponse, error)
@@ -662,6 +873,24 @@ type DocNoGenServiceServer interface {
 
 func RegisterDocNoGenServiceServer(s *grpc.Server, srv DocNoGenServiceServer) {
 	s.RegisterService(&_DocNoGenService_serviceDesc, srv)
+}
+
+func _DocNoGenService_GenerateBulkDocNoFormat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateBulkDocNoFormatRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DocNoGenServiceServer).GenerateBulkDocNoFormat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/docnogen.DocNoGenService/GenerateBulkDocNoFormat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DocNoGenServiceServer).GenerateBulkDocNoFormat(ctx, req.(*GenerateBulkDocNoFormatRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _DocNoGenService_GenerateDocNoFormat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -722,6 +951,10 @@ var _DocNoGenService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "docnogen.DocNoGenService",
 	HandlerType: (*DocNoGenServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GenerateBulkDocNoFormat",
+			Handler:    _DocNoGenService_GenerateBulkDocNoFormat_Handler,
+		},
 		{
 			MethodName: "GenerateDocNoFormat",
 			Handler:    _DocNoGenService_GenerateDocNoFormat_Handler,

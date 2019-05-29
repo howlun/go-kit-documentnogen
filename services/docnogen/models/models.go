@@ -81,7 +81,7 @@ type DocNo struct {
 
 type DocNoRepository interface {
 	GetByPath(docCode string, orgCode string, path string) (doc *DocNo, err error)
-	UpdateByPath(orgCode string, doc *DocNo, recordTimestampCheck int64) (updated *DocNo, err error)
+	UpdateByPath(orgCode string, doc *DocNo, curSeqNo int64, recordTimestampCheck int64) (updated *DocNo, err error)
 }
 
 type docNoRepository struct {
@@ -152,7 +152,7 @@ func (d *docNoRepository) GetByPath(docCode string, orgCode string, path string)
 	return doc, nil
 }
 
-func (d *docNoRepository) UpdateByPath(orgCode string, doc *DocNo, recordTimestampCheck int64) (updated *DocNo, err error) {
+func (d *docNoRepository) UpdateByPath(orgCode string, doc *DocNo, curSeqNo int64, recordTimestampCheck int64) (updated *DocNo, err error) {
 	if doc == nil {
 		return nil, errors.New("Document to be updated is nil")
 	}
@@ -167,6 +167,10 @@ func (d *docNoRepository) UpdateByPath(orgCode string, doc *DocNo, recordTimesta
 
 	if doc.NextSeqNo == 0 {
 		return nil, errors.New("Document Next Sequence No is empty")
+	}
+
+	if curSeqNo == 0 {
+		return nil, errors.New("Current Sequence Number for concurrency check cannot be zero")
 	}
 
 	if recordTimestampCheck <= 0 {
@@ -196,7 +200,11 @@ func (d *docNoRepository) UpdateByPath(orgCode string, doc *DocNo, recordTimesta
 	}
 
 	// check if record has been altered before update
-	fmt.Println("check if record has been altered before update")
+	fmt.Println("check if record has been altered before update with CurSeqNo")
+	if updated != nil && updated.NextSeqNo != curSeqNo {
+		return nil, common.ConcurrencyUpdateError
+	}
+	fmt.Println("check if record has been altered before update with RecordTimestamp")
 	if updated != nil && updated.RecordTimestamp != recordTimestampCheck {
 		return nil, common.ConcurrencyUpdateError
 	}

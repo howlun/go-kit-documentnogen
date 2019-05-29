@@ -28,6 +28,13 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 	}
 }
 
+func (mw loggingMiddleware) GenerateBulkDocNoFormat(ctx context.Context, in *pb.GenerateBulkDocNoFormatRequest) (out *pb.GenerateBulkDocNoFormatResponse, err error) {
+	defer func(begin time.Time) {
+		mw.logger.Log("method", "GenerateBulkDocNoFormat", "took", time.Since(begin), "err", err)
+	}(time.Now())
+	return mw.next.GenerateBulkDocNoFormat(ctx, in)
+}
+
 func (mw loggingMiddleware) GenerateDocNoFormat(ctx context.Context, in *pb.GenerateDocNoFormatRequest) (out *pb.GenerateDocNoFormatResponse, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log("method", "GenerateDocNoFormat", "took", time.Since(begin), "err", err)
@@ -66,6 +73,13 @@ func InstrumentingMiddleware(ints, chars metrics.Counter) Middleware {
 			next: next,
 		}
 	}
+}
+
+func (mw instrumentingMiddleware) GenerateBulkDocNoFormat(ctx context.Context, in *pb.GenerateBulkDocNoFormatRequest) (out *pb.GenerateBulkDocNoFormatResponse, err error) {
+	v, err := mw.next.GenerateBulkDocNoFormat(ctx, in)
+	// TODO: implement instrumenting logic here
+
+	return v, err
 }
 
 func (mw instrumentingMiddleware) GenerateDocNoFormat(ctx context.Context, in *pb.GenerateDocNoFormatRequest) (out *pb.GenerateDocNoFormatResponse, err error) {

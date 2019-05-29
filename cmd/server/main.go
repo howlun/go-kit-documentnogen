@@ -35,7 +35,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "docnogen-server"
 	app.Usage = "Document Number Generator Server (gRPC + http)"
-	app.Version = "0.0.1"
+	app.Version = "1.2.0"
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "Par How Lun",

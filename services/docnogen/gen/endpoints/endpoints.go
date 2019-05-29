@@ -23,11 +23,21 @@ var _ = fmt.Errorf
 type StreamEndpoint func(server interface{}, req interface{}) (err error)
 
 type Endpoints struct {
+	GenerateBulkDocNoFormatEndpoint endpoint.Endpoint
+
 	GenerateDocNoFormatEndpoint endpoint.Endpoint
 
 	GetNextDocNoEndpoint endpoint.Endpoint
 
 	ConsumeDocNoEndpoint endpoint.Endpoint
+}
+
+func (e *Endpoints) GenerateBulkDocNoFormat(ctx context.Context, in *pb.GenerateBulkDocNoFormatRequest) (*pb.GenerateBulkDocNoFormatResponse, error) {
+	out, err := e.GenerateBulkDocNoFormatEndpoint(ctx, in)
+	if err != nil {
+		return &pb.GenerateBulkDocNoFormatResponse{}, err
+	}
+	return out.(*pb.GenerateBulkDocNoFormatResponse), err
 }
 
 func (e *Endpoints) GenerateDocNoFormat(ctx context.Context, in *pb.GenerateDocNoFormatRequest) (*pb.GenerateDocNoFormatResponse, error) {
@@ -52,6 +62,17 @@ func (e *Endpoints) ConsumeDocNo(ctx context.Context, in *pb.ConsumeDocNoRequest
 		return &pb.ConsumeDocNoResponse{}, err
 	}
 	return out.(*pb.ConsumeDocNoResponse), err
+}
+
+func MakeGenerateBulkDocNoFormatEndpoint(svc pb.DocNoGenServiceServer) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(*pb.GenerateBulkDocNoFormatRequest)
+		rep, err := svc.GenerateBulkDocNoFormat(ctx, req)
+		if err != nil {
+			return &pb.GenerateBulkDocNoFormatResponse{}, err
+		}
+		return rep, nil
+	}
 }
 
 func MakeGenerateDocNoFormatEndpoint(svc pb.DocNoGenServiceServer) endpoint.Endpoint {
@@ -89,6 +110,15 @@ func MakeConsumeDocNoEndpoint(svc pb.DocNoGenServiceServer) endpoint.Endpoint {
 
 func MakeEndpoints(svc pb.DocNoGenServiceServer, logger log.Logger, duration metrics.Histogram) Endpoints {
 
+	var generateBulkDocNoFormatEndpoint endpoint.Endpoint
+	{
+		generateBulkDocNoFormatEndpoint = MakeGenerateBulkDocNoFormatEndpoint(svc)
+		generateBulkDocNoFormatEndpoint = ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 10))(generateBulkDocNoFormatEndpoint)
+		generateBulkDocNoFormatEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{}))(generateBulkDocNoFormatEndpoint)
+		generateBulkDocNoFormatEndpoint = LoggingMiddleware(log.With(logger, "method", "GenerateBulkDocNoFormat"))(generateBulkDocNoFormatEndpoint)
+		generateBulkDocNoFormatEndpoint = InstrumentingMiddleware(duration.With("method", "GenerateBulkDocNoFormat"))(generateBulkDocNoFormatEndpoint)
+	}
+
 	var generatedocnoformatEndpoint endpoint.Endpoint
 	{
 		generatedocnoformatEndpoint = MakeGenerateDocNoFormatEndpoint(svc)
@@ -117,6 +147,8 @@ func MakeEndpoints(svc pb.DocNoGenServiceServer, logger log.Logger, duration met
 	}
 
 	return Endpoints{
+
+		GenerateBulkDocNoFormatEndpoint: generateBulkDocNoFormatEndpoint,
 
 		GenerateDocNoFormatEndpoint: generatedocnoformatEndpoint,
 
