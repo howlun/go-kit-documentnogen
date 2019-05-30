@@ -15,6 +15,7 @@ message GenerateBulkDocNoFormatRequest {
     string path = 3;
     map<string, string> variableMap = 4;
     uint32 bulkNumber = 5;
+    string customFormat = 6;
 }
 
 message GenerateBulkDocNoFormatResponse {
@@ -35,6 +36,7 @@ message GenerateDocNoFormatRequest {
     string orgCode = 2;
     string path = 3;
     map<string, string> variableMap = 4;
+    string customFormat = 5;
 }
 
 message GenerateDocNoFormatResponse {
@@ -54,6 +56,8 @@ message GetNextDocNoRequest {
     string docCode = 1;
     string orgCode = 2;
     string path = 3;
+    map<string, string> variableMap = 4;
+    string customFormat = 5;
 }
 
 message GetNextDocNoResponse {
@@ -62,8 +66,9 @@ message GetNextDocNoResponse {
     string errorMessage = 3;
 
     message Result {
-        uint32 nextSeqNo = 1;
-        int64 recordTimestamp = 2;
+        string docNoString = 1;
+        uint32 nextSeqNo = 2;
+        int64 recordTimestamp = 3;
     }
     Result result = 4;
 }
