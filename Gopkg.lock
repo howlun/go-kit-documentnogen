@@ -154,6 +154,14 @@
   revision = "9935e8e0588d26307d1d4a07bed7bd47271b6bbd"
 
 [[projects]]
+  digest = "1:b0c25f00bad20d783d259af2af8666969e2fc343fa0dc9efe52936bbd67fb758"
+  name = "github.com/rs/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "9a47f48565a795472d43519dd49aac781f3034fb"
+  version = "v1.6.0"
+
+[[projects]]
   digest = "1:237af0cf68bac89e21af72e6cd6b64f388854895e75f82ad08c6c011e1a8286c"
   name = "github.com/smartystreets/assertions"
   packages = [
@@ -339,6 +347,7 @@
     "github.com/gorilla/handlers",
     "github.com/prometheus/client_golang/prometheus",
     "github.com/prometheus/client_golang/prometheus/promhttp",
+    "github.com/rs/cors",
     "github.com/smartystreets/goconvey/convey",
     "github.com/sony/gobreaker",
     "github.com/urfave/cli",
