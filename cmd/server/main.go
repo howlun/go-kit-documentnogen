@@ -171,8 +171,11 @@ func runMain(c *cli.Context) error {
 			errc <- err
 		}
 
+		// enable cors
+		cr := cors.AllowAll()
+
 		// gorilla/handlers LoggingHandler is used for logging HTTP requests in the Apache Common Log Format
-		errc <- http.ListenAndServe(c.String("httpaddr"), cors.Default().Handler(handlers.LoggingHandler(httpLogFile, mux)))
+		errc <- http.ListenAndServe(c.String("httpaddr"), cr.Handler(handlers.LoggingHandler(httpLogFile, mux)))
 	}()
 
 	go func() {
