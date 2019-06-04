@@ -61,6 +61,26 @@ $ go build
 $ sudo systemctl restart docnogen-api
 ```
 
+## Steps to test CORS with Google Chrome Console:
+Open up **Google Developer Tools**, and then switch to **Console** and type following:
+```
+fetch('http://localhost:12000/GetNextDocNo', {
+  method: 'POST',
+  body: JSON.stringify({
+    docCode: "AP",
+	orgCode: "MAT",
+	path: "AP/PO/YGN-HQ/19",
+	variableMap: { "DOCTYPE": "PO", "BRHCD": "YGN-HQ", "YEAR": "19" },
+	customFormat: "{{PREFIX}}{{SEQNO}}"
+  }),
+  headers: {
+    'Content-type': 'application/json; charset=UTF-8'
+  }
+})
+.then(res => res.json())
+.then(console.log)
+```
+
 ## Steps to change API parameters, and regenerate proto file
 1. go to **DOCNOGEN_BE/services/docnogen/docnogen.proto**, make changes or add new api interface to the file
 2. bring up the terminal, and type following:
