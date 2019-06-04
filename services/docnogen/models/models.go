@@ -12,7 +12,8 @@ import (
 )
 
 type DBClient interface {
-	CurrentDB() *mgo.Database
+	CurrentSession() *mgo.Session
+	CurrentDB(s *mgo.Session) *mgo.Database
 	DialWithInfo() error
 	Close()
 }
@@ -36,8 +37,12 @@ func NewDBClient(dbUrl string, dbName string, authUsername string, authPassword 
 	return db
 }
 
-func (m *mongoDBClient) CurrentDB() *mgo.Database {
-	return m.DBSession.DB(m.DBName)
+func (m *mongoDBClient) CurrentSession() *mgo.Session {
+	return m.DBSession.Copy()
+}
+
+func (m *mongoDBClient) CurrentDB(s *mgo.Session) *mgo.Database {
+	return s.DB(m.DBName)
 }
 
 func (m *mongoDBClient) DialWithInfo() error {
@@ -108,16 +113,16 @@ func (d *docNoRepository) GetByPath(docCode string, orgCode string, path string)
 		return nil, errors.New("DB Client is Nil")
 	}
 
-	// Dial to DB with extra info
-	err = d.DB.DialWithInfo()
-	if err != nil {
-		return nil, fmt.Errorf("Failed to establish connection to Mongo Server: %s", err.Error())
+	// Get Current DB Session
+	s := d.DB.CurrentSession()
+	if s == nil {
+		return nil, fmt.Errorf("DB Session is nil")
 	}
-	defer d.DB.Close()
+	defer s.Close()
 
 	// the document is group by collection (organization code)
 	// perform find doc by colletion and paramter: Path (no unique ID here)
-	collection := d.DB.CurrentDB().C(orgCode)
+	collection := d.DB.CurrentDB(s).C(orgCode)
 	if collection == nil {
 		return nil, fmt.Errorf("Collection is nil with Org Code=%s", orgCode)
 	}
@@ -177,16 +182,16 @@ func (d *docNoRepository) UpdateByPath(orgCode string, doc *DocNo, curSeqNo int6
 		return nil, errors.New("Record timestamp for concurrency check cannot be zero or less than zero")
 	}
 
-	// Dial to DB with extra info
-	err = d.DB.DialWithInfo()
-	if err != nil {
-		return nil, fmt.Errorf("Failed to establish connection to Mongo Server: %s", err.Error())
+	// Get Current DB Session
+	s := d.DB.CurrentSession()
+	if s == nil {
+		return nil, fmt.Errorf("DB Session is nil")
 	}
-	defer d.DB.Close()
+	defer s.Close()
 
 	// the document is group by collection (organization code)
 	// perform find doc by colletion and paramter: Path (no unique ID here)
-	collection := d.DB.CurrentDB().C(orgCode)
+	collection := d.DB.CurrentDB(s).C(orgCode)
 	if collection == nil {
 		return nil, fmt.Errorf("Collection is nil with Org Code=%s", orgCode)
 	}
