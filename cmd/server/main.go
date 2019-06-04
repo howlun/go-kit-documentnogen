@@ -140,6 +140,12 @@ func runMain(c *cli.Context) error {
 
 	{
 		dbclient := docnogenmodel.NewDBClient(c.String("mongoaddr"), c.String("mongodbname"), c.String("mongoauthusername"), c.String("mongoauthpassword"))
+		err := dbclient.DialWithInfo()
+		if err != nil {
+			stdLog.Fatal(fmt.Errorf("Failed to establish connection to Mongo Server: %s", err.Error()))
+		}
+		defer dbclient.Close()
+
 		docNoRepo := docnogenmodel.NewDocNoRepository(dbclient)
 
 		docNoFormatterSvc := docnogensvc.NewDocnoformatterService()
