@@ -29,6 +29,8 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -170,7 +172,7 @@ func runMain(c *cli.Context) error {
 		}
 
 		// gorilla/handlers LoggingHandler is used for logging HTTP requests in the Apache Common Log Format
-		errc <- http.ListenAndServe(c.String("httpaddr"), handlers.LoggingHandler(httpLogFile, mux))
+		errc <- http.ListenAndServe(c.String("httpaddr"), cors.Default().Handler(handlers.LoggingHandler(httpLogFile, mux)))
 	}()
 
 	go func() {
@@ -186,6 +188,20 @@ func runMain(c *cli.Context) error {
 
 	logger.Log("exit", <-errc)
 	return nil
+}
+
+func accessControl(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
 }
 
 func ensureDir(fileName string) error {
